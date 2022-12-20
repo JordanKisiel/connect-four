@@ -3,7 +3,8 @@ import React from 'react'
 export default function MenuButton(props){
     
     return (
-        <button 
+        <button
+            onClick={props.handleDisplay} 
             className={`
                 ${props.bgColor} 
                 ${props.textColor} 
