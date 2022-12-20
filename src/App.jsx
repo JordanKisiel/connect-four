@@ -1,9 +1,16 @@
 import React from 'react'
+import MainMenu from './components/MainMenu'
 
 function App() {
 
+  const [display, setDisplay] = React.useState(['main-menu'])
+
+  const currentDisplay = display[display.length - 1]
+
   return (
-    <h1 className="text-4xl">Hello</h1>
+    <>
+      {(currentDisplay === 'main-menu') && <MainMenu />}
+    </>
   )
 }
 
