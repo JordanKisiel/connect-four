@@ -10,22 +10,26 @@ export default function MainMenu(props){
             <div className="w-full space-y-6">
                 <MenuButton 
                     bgColor="bg-red-300" 
-                    textColor="text-neutral-100" 
+                    textColor="text-neutral-100"
+                    textAlign="text-left" 
                     textDisplay="Play vs CPU"
                     bgImage="bg-[url(/src/assets/player-vs-cpu.svg)]"
+                    handleDisplay={props.handleGameDisplay}
                 />
                 <MenuButton 
                     bgColor="bg-yellow-300" 
-                    textColor="text-neutral-900" 
+                    textColor="text-neutral-900"
+                    textAlign="text-left"  
                     textDisplay="Play vs Player"
                     bgImage="bg-[url(/src/assets/player-vs-player.svg)]"
                 />
                 <MenuButton 
                     bgColor="bg-neutral-100" 
-                    textColor="text-neutral-900" 
+                    textColor="text-neutral-900"
+                    textAlign="text-left"  
                     textDisplay="Game Rules"
                     bgImage=""
-                    handleDisplay={props.handleDisplay}
+                    handleDisplay={props.handleRulesDisplay}
                 />
             </div>
         </div>

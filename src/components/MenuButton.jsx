@@ -9,6 +9,7 @@ export default function MenuButton(props){
                 ${props.bgColor} 
                 ${props.textColor} 
                 ${props.bgImage}
+                ${props.textAlign}
                 rounded-3xl
                 shadow-2xl
                 border-[3px]
@@ -19,10 +20,8 @@ export default function MenuButton(props){
                 bg-no-repeat
                 bg-[center_right_1rem]
                 py-5
-                pl-5
-                pr-32
+                px-5
                 w-full
-                text-left
             `}
         >
             {props.textDisplay}
