@@ -1,7 +1,8 @@
 import React from 'react'
 import Space from './Space'
+import ColumnIndicator from './ColumnIndicator'
 
-export default function Column(){
+export default function Column(props){
 
     const boardRows = 6
 
@@ -15,6 +16,7 @@ export default function Column(){
 
     return (
         <div className="grid grid-rows-6 gap-[0.22rem]">
+            { props.index === props.selectedCol && <ColumnIndicator /> }
             { spaces }
         </div>
     )

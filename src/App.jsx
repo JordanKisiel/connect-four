@@ -3,7 +3,7 @@ import MainMenu from './components/MainMenu'
 import Rules from './components/Rules'
 import Game from './components/Game'
 
-function App() {
+export default function App() {
 
   const [display, setDisplay] = React.useState(['main-menu']) //options: 'main-menu', 'rules', 'game-vs-cpu'
   let currentDisplay = display[display.length - 1]
@@ -27,5 +27,3 @@ function App() {
     </>
   )
 }
-
-export default App
