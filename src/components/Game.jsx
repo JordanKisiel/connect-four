@@ -41,13 +41,26 @@ export default function Game(props){
             })
         })
 
-        setIsFirstPlayerTurn(prevValue => !prevValue)
+        if(board[selectedColIndex].includes(null)){
+            setIsFirstPlayerTurn(prevValue => !prevValue)
+        }
     }
 
     function handleColSelect(isMoveToLeft){
         isMoveToLeft ? 
             setSelectedCol(prevCol => prevCol > 0 ? prevCol - 1 : 0):
             setSelectedCol(prevCol => prevCol < 6 ? prevCol + 1 : 6)
+    }
+
+    function handleRestart(){
+        //empty board
+        setBoard(Array(7).fill(Array(6).fill(null)))
+
+        //return selected column to middle
+        setSelectedCol(3)
+
+        //set turn back to first player
+        setIsFirstPlayerTurn(true)
     }
     
     return (
@@ -66,7 +79,7 @@ export default function Game(props){
                     bgColor="bg-purple-500" 
                     textColor="text-neutral-100" 
                     paddingX="px-6" 
-                    handleDisplay={() => {}}
+                    handleRestart={handleRestart}
                 />
             </div>
 
