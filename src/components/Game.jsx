@@ -19,6 +19,10 @@ export default function Game(props){
     //initialized to 3 because that is the center column on the board
     const [selectedCol, setSelectedCol] = React.useState(3)
 
+
+    //keep track of player turn
+    const [isFirstPlayerTurn, setIsFirstPlayerTurn] = React.useState(true)
+
     //function to take selected column as an index
     //and update the board state to represent a disc being
     //dropped in that column
@@ -36,6 +40,8 @@ export default function Game(props){
                             : col
             })
         })
+
+        setIsFirstPlayerTurn(prevValue => !prevValue)
     }
 
     function handleColSelect(isMoveToLeft){
@@ -66,26 +72,30 @@ export default function Game(props){
 
             <Board
                 selectedCol={selectedCol}
+                board={board}
+                isFirstPlayerTurn={isFirstPlayerTurn}
             />
 
             <div className="w-full flex justify-between items-center mb-12">
                 <ColumnSelectButton
                     isLeft={true}
                     handleColSelect={handleColSelect}
+                    isFirstPlayerTurn={isFirstPlayerTurn}
                 />
                 <ColumnSelectButton
                     isLeft={false}
                     handleColSelect={handleColSelect}
+                    isFirstPlayerTurn={isFirstPlayerTurn}
                 />
             </div>
 
             <MenuButton 
-                bgColor="bg-red-300"
-                textColor="text-neutral-100"
+                bgColor={isFirstPlayerTurn ? "bg-red-300" : "bg-yellow-300"}
+                textColor={isFirstPlayerTurn ? "text-neutral-100" : "text-neutral-900"}
                 textAlign="text-center"
                 textDisplay="Drop!"
                 bgImage=""
-                handleDrop={() => handleDrop(selectedCol, true)} //hard-coded true is test
+                handleDrop={() => handleDrop(selectedCol, isFirstPlayerTurn)}
             />
         </div>
     )

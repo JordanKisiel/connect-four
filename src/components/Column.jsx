@@ -4,19 +4,23 @@ import ColumnIndicator from './ColumnIndicator'
 
 export default function Column(props){
 
-    const boardRows = 6
-
-    const spaceArray = Array(boardRows).fill('')
-
-    const spaces = spaceArray.map((row, index) => {
+    //reverse array so that column renders bottom up
+    const spaces = props.board[props.index].map((value, index) => {
         return (
-            <Space key={index} />
+            <Space 
+                key={index} 
+                value={value}
+            />
         )
-    })
+    }).reverse()
 
     return (
         <div className="grid grid-rows-6 gap-[0.22rem]">
-            { props.index === props.selectedCol && <ColumnIndicator /> }
+            { props.index === props.selectedCol 
+                && <ColumnIndicator
+                        isFirstPlayerTurn={props.isFirstPlayerTurn}
+                    /> 
+            }
             { spaces }
         </div>
     )

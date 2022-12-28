@@ -15,6 +15,8 @@ export default function Board(props){
                 key={index}
                 index={index}
                 selectedCol={props.selectedCol}
+                board={props.board}
+                isFirstPlayerTurn={props.isFirstPlayerTurn}
             />
         )
     })
