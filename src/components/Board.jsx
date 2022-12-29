@@ -13,10 +13,11 @@ export default function Board(props){
         return (
             <Column 
                 key={index}
-                index={index}
+                rowIndex={index}
                 selectedCol={props.selectedCol}
                 board={props.board}
                 isFirstPlayerTurn={props.isFirstPlayerTurn}
+                winningSlots={props.winningSlots}
             />
         )
     })

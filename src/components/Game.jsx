@@ -62,6 +62,70 @@ export default function Game(props){
         //set turn back to first player
         setIsFirstPlayerTurn(true)
     }
+
+    //algoritm from:
+    //https://codereview.stackexchange.com/a/127105
+    //this function can also be used to detect a winner
+    //by checking length of returned array
+    function getWinningSlots(board){
+        const height = board[0].length
+        const width = board.length
+        const emptySlot = null
+
+        for(let row = 0; row < width; row++){ 
+            for(let col = 0; col < height; col++){
+                let slot = board[row][col]
+
+                if(slot === emptySlot){
+
+                    continue //don't check starting from empty slots
+                }
+
+                if(col + 3 < height &&
+                    slot === board[row][col + 1] && //look right
+                    slot === board[row][col + 2] &&
+                    slot === board[row][col + 3]){
+                        return [[row, col],
+                                [row, col + 1], 
+                                [row, col + 2], 
+                                [row, col + 3]]
+                }
+
+                if(row + 3 < width){
+                    if(slot === board[row + 1][col] && //look up
+                       slot === board[row + 2][col] &&
+                       slot === board[row + 3][col]){
+                            return [[row, col], 
+                                    [row + 1, col], 
+                                    [row + 2, col], 
+                                    [row + 3, col]]
+                    }
+
+                    if(col + 3 < height &&
+                        slot === board[row + 1][col + 1] && //look up & right
+                        slot === board[row + 2][col + 2] &&
+                        slot === board[row + 3][col + 3]){
+                            return [[row, col],
+                                    [row + 1, col + 1], 
+                                    [row + 2, col + 2], 
+                                    [row + 3, col + 3]]
+                    }
+
+                    if(col - 3 >= 0 &&
+                        slot === board[row + 1][col - 1] && //look up & left
+                        slot === board[row + 2][col - 2] &&
+                        slot === board[row + 3][col - 3]){
+                            return [[row, col],
+                                    [row + 1, col - 1], 
+                                    [row + 2, col - 2], 
+                                    [row + 3, col - 3]]
+                    }
+                }
+            }
+        }
+
+        return [] //if no winning line, return no winning slots
+    }
     
     return (
         <div className="h-[100vh] flex flex-col items-center justify-center p-4">
@@ -87,6 +151,7 @@ export default function Game(props){
                 selectedCol={selectedCol}
                 board={board}
                 isFirstPlayerTurn={isFirstPlayerTurn}
+                winningSlots={getWinningSlots(board)}
             />
 
             <div className="w-full flex justify-between items-center mb-12">
