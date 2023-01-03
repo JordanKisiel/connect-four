@@ -192,9 +192,40 @@ export default function Game(props){
 
         return isEmpty
     }
+
+    function getBGToUse(isWinner, isPlayer1Turn){
+        //3 possible backgrounds to use based upon state of game
+        const playBG = 'bg-[url(/src/assets/bg-shape-mobile.svg)]'
+        const player1WinsBG = 'bg-[url(/src/assets/bg-shape-mobile-red.svg)]'
+        const player2WinsBG = 'bg-[url(/src/assets/bg-shape-mobile-yellow.svg)]'
+
+        if(isWinner && isPlayer1Turn){
+            return player1WinsBG
+        }
+        else if(isWinner && !isPlayer1Turn){
+            return player2WinsBG
+        }
+        else{
+            return playBG
+        }
+    }
     
     return (
-        <div className="h-[100vh] flex flex-col items-center justify-center p-4 bg-[url(/src/assets/bg-shape-mobile.svg)] bg-no-repeat bg-contain bg-bottom">
+        <div 
+            className={
+                `relative 
+                h-[100vh] 
+                flex 
+                flex-col 
+                items-center 
+                px-4 
+                pt-16 
+                ${getBGToUse(getWinningSlots(board).length !== 0, isPlayer1Turn)} 
+                bg-no-repeat 
+                bg-contain 
+                bg-bottom`
+                }
+        >
             <div className="relative w-full flex justify-between items-center mb-32">
                 <Button 
                     textDisplay="Menu" 
@@ -220,30 +251,36 @@ export default function Game(props){
                 winningSlots={getWinningSlots(board)}
             />
 
-            <div className="w-full flex justify-between items-center mb-12">
-                <ColumnSelectButton
-                    isLeft={true}
-                    handleColSelect={handleColSelect}
-                    isPlayer1Turn={isPlayer1Turn}
-                />
-                <ColumnSelectButton
-                    isLeft={false}
-                    handleColSelect={handleColSelect}
-                    isPlayer1Turn={isPlayer1Turn}
-                />
-            </div>
+            {!isGameOver &&
+                <div className="w-full flex justify-between items-center mb-12">
+                    <ColumnSelectButton
+                        isLeft={true}
+                        handleColSelect={handleColSelect}
+                        isPlayer1Turn={isPlayer1Turn}
+                    />
+                    <ColumnSelectButton
+                        isLeft={false}
+                        handleColSelect={handleColSelect}
+                        isPlayer1Turn={isPlayer1Turn}
+                    />
+                </div>
+            }
 
-            <MenuButton 
-                bgColor={isPlayer1Turn ? "bg-red-300" : "bg-yellow-300"}
-                textColor={isPlayer1Turn ? "text-neutral-100" : "text-neutral-900"}
-                textAlign="text-center"
-                textDisplay="Drop!"
-                bgImage=""
-                handleDrop={() => handleDrop(selectedCol, isPlayer1Turn)}
-            />
+            {!isGameOver &&
+                <MenuButton 
+                    bgColor={isPlayer1Turn ? "bg-red-300" : "bg-yellow-300"}
+                    textColor={isPlayer1Turn ? "text-neutral-100" : "text-neutral-900"}
+                    textAlign="text-center"
+                    textDisplay="Drop!"
+                    bgImage=""
+                    handleDrop={() => handleDrop(selectedCol, isPlayer1Turn)}
+                />
+            }
 
             {isGameOver && 
                 <ResultDisplay
+                    isPlayer1Turn={isPlayer1Turn}
+                    isWinner={getWinningSlots(board).length !== 0}
                     handleNewGame={handleNewGame}
                 />
             }
