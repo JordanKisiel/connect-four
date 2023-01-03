@@ -4,7 +4,7 @@ export default function Button(props){
 
     return (
         <button 
-            onClick={props.handleDisplay || props.handleRestart} 
+            onClick={props.handleDisplay || props.handleRestart || props.handleNewGame} 
             className={
                 `${props.bgColor} 
                 ${props.textColor} 

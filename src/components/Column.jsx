@@ -21,7 +21,7 @@ export default function Column(props){
         <div className="grid grid-rows-6 gap-[0.22rem]">
             { props.rowIndex === props.selectedCol 
                 && <ColumnIndicator
-                        isFirstPlayerTurn={props.isFirstPlayerTurn}
+                        isPlayer1Turn={props.isPlayer1Turn}
                     /> 
             }
             { spaces }

@@ -6,29 +6,24 @@ import yellowRightButton from '../assets/arrow-right-yellow.svg'
 
 export default function ColumnSelectButton(props){
 
-    let image = ''
+    let leftOption = ''
+    let rightOption = ''
 
-    if(props.isFirstPlayerTurn){
-        if(props.isLeft){
-            image = redLeftButton
-        }
-        else{
-            image = redRightButton
-        }
+    if(props.isPlayer1Turn){
+        leftOption = redLeftButton
+        rightOption = redRightButton
     }
     else{
-        if(props.isLeft){
-            image = yellowLeftButton
-        }
-        else{
-            image = yellowRightButton
-        }
+        leftOption = yellowLeftButton
+        rightOption = yellowRightButton
     }
 
     return (
-        <img
-            onClick={() => props.handleColSelect(props.isLeft)}
-            src={image}
-        />
+        <button>
+            <img
+                onClick={() => props.handleColSelect(props.isLeft)}
+                src={props.isLeft ? leftOption : rightOption}
+            />
+        </button>
     )
 }

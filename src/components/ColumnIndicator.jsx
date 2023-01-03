@@ -4,10 +4,17 @@ import yellowIndicator from '../assets/column-indicator-yellow.svg'
 
 export default function ColumnIndicator(props){
 
+    let imageSrc = ''
+    if(props.isPlayer1Turn){
+        imageSrc = redIndicator
+    }
+    else{
+        imageSrc = yellowIndicator
+    }
 
     return(
         <div className="absolute -top-[3.2rem] z-10">
-            <img src={props.isFirstPlayerTurn ? redIndicator : yellowIndicator} />
+            <img src={imageSrc} />
         </div>
     )
 }

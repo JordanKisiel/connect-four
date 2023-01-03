@@ -4,6 +4,7 @@ import Button from './Button'
 import Board from './Board'
 import MenuButton from './MenuButton'
 import ColumnSelectButton from './ColumnSelectButton'
+import ResultDisplay from './ResultDisplay'
 
 export default function Game(props){
 
@@ -19,9 +20,32 @@ export default function Game(props){
     //initialized to 3 because that is the center column on the board
     const [selectedCol, setSelectedCol] = React.useState(3)
 
-
     //keep track of player turn
-    const [isFirstPlayerTurn, setIsFirstPlayerTurn] = React.useState(true)
+    const [isPlayer1Turn, setIsPlayer1Turn] = React.useState(true)
+
+    //keep track of which player made the first move this game
+    const [isPlayer1First, setIsPlayer1First] = React.useState(true)
+
+    //keep track of whether current game has ended
+    //this could be because a player won or there is a draw
+    const [isGameOver, setIsGameOver] = React.useState(false)
+
+    React.useEffect(() => {
+        //change whose turn it is if a selected column to drop in was not full
+        //and if no win is detected
+        //and if the board is not empty (this protects against the first run of the useEffect
+        //changing the turn without a drop)
+        const isWin = getWinningSlots(board).length !== 0
+
+        if(board[selectedCol].includes(null) && !isWin && !isBoardEmpty(board)){
+            setIsPlayer1Turn(prevValue => !prevValue)
+        }
+
+        //if there is a win or draw, the game is over
+        if(isWin || isBoardFull(board)){
+            setIsGameOver(prevValue => !prevValue)
+        }
+    }, [board])
 
     //function to take selected column as an index
     //and update the board state to represent a disc being
@@ -40,10 +64,6 @@ export default function Game(props){
                             : col
             })
         })
-
-        if(board[selectedColIndex].includes(null)){
-            setIsFirstPlayerTurn(prevValue => !prevValue)
-        }
     }
 
     function handleColSelect(isMoveToLeft){
@@ -53,14 +73,34 @@ export default function Game(props){
     }
 
     function handleRestart(){
+        //only allow restarts before current game ends
+        if(!isGameOver){
+            //empty board
+            setBoard(Array(7).fill(Array(6).fill(null)))
+
+            //return selected column to middle
+            setSelectedCol(3)
+
+            //set turn back to first player
+            setIsPlayer1Turn(isPlayer1First)
+        }
+    }
+
+    function handleNewGame(){
         //empty board
         setBoard(Array(7).fill(Array(6).fill(null)))
 
         //return selected column to middle
         setSelectedCol(3)
 
-        //set turn back to first player
-        setIsFirstPlayerTurn(true)
+        //player that makes the first move of the new game is the opposite of who made it last game
+        setIsPlayer1Turn(!isPlayer1First)
+
+        //reflect the fact that this game started with the opposite player
+        setIsPlayer1First(prevValue => !prevValue)
+
+        //reset game over state
+        setIsGameOver(false)
     }
 
     //algoritm from:
@@ -126,9 +166,35 @@ export default function Game(props){
 
         return [] //if no winning line, return no winning slots
     }
+
+    //check every space and return true only if there are no empty spaces
+    function isBoardFull(board){
+        for(let i = 0; i < board.length; i++){
+            for(let j = 0; j < board[0].length; j++){
+                if(board[i][j] === null){
+                    return false
+                }
+            }
+        }
+
+        return true
+    }
+
+    function isBoardEmpty(board){
+        let isEmpty = true
+        for(let i = 0; i < board.length; i++){
+            for(let j = 0; j < board[0].length; j++){
+                if(board[i][j] !== null){
+                    isEmpty = false
+                }
+            }
+        }
+
+        return isEmpty
+    }
     
     return (
-        <div className="h-[100vh] flex flex-col items-center justify-center p-4">
+        <div className="h-[100vh] flex flex-col items-center justify-center p-4 bg-[url(/src/assets/bg-shape-mobile.svg)] bg-no-repeat bg-contain bg-bottom">
             <div className="relative w-full flex justify-between items-center mb-32">
                 <Button 
                     textDisplay="Menu" 
@@ -150,7 +216,7 @@ export default function Game(props){
             <Board
                 selectedCol={selectedCol}
                 board={board}
-                isFirstPlayerTurn={isFirstPlayerTurn}
+                isPlayer1Turn={isPlayer1Turn}
                 winningSlots={getWinningSlots(board)}
             />
 
@@ -158,23 +224,29 @@ export default function Game(props){
                 <ColumnSelectButton
                     isLeft={true}
                     handleColSelect={handleColSelect}
-                    isFirstPlayerTurn={isFirstPlayerTurn}
+                    isPlayer1Turn={isPlayer1Turn}
                 />
                 <ColumnSelectButton
                     isLeft={false}
                     handleColSelect={handleColSelect}
-                    isFirstPlayerTurn={isFirstPlayerTurn}
+                    isPlayer1Turn={isPlayer1Turn}
                 />
             </div>
 
             <MenuButton 
-                bgColor={isFirstPlayerTurn ? "bg-red-300" : "bg-yellow-300"}
-                textColor={isFirstPlayerTurn ? "text-neutral-100" : "text-neutral-900"}
+                bgColor={isPlayer1Turn ? "bg-red-300" : "bg-yellow-300"}
+                textColor={isPlayer1Turn ? "text-neutral-100" : "text-neutral-900"}
                 textAlign="text-center"
                 textDisplay="Drop!"
                 bgImage=""
-                handleDrop={() => handleDrop(selectedCol, isFirstPlayerTurn)}
+                handleDrop={() => handleDrop(selectedCol, isPlayer1Turn)}
             />
+
+            {isGameOver && 
+                <ResultDisplay
+                    handleNewGame={handleNewGame}
+                />
+            }
         </div>
     )
 }
