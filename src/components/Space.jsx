@@ -16,8 +16,7 @@ export default function Space(props){
     const isWinningSlot = props.winningSlots.some((coord) => {
         return coord[0] === props.rowIndex && coord[1] === props.colIndex
     })
-    //console.log('row index: ', props.rowIndex)
-    //console.log('col index: ', props.colIndex)
+
     return (
         <div className="-z-10 relative">
             {isWinningSlot && <img className="z-10 absolute w-1/2 left-1/4 top-1/4" src={winningMark} /> }
