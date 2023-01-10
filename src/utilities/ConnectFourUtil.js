@@ -25,129 +25,218 @@
 
 const testBoard1 = 
 [
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-]
-
-const testBoard2 = 
-[
-    [true, null, null, null, null, null],
-    [true, null, null, null, null, null],
-    [true, null, null, null, null, null],
-    [true, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-]
-
-const testBoard3 = 
-[
-    [true, null, null, null, null, null],
-    [true, null, null, null, null, null],
-    [true, null, null, null, null, null],
-    [false, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-]
-
-const testBoard4 = 
-[
-    [true, true, true, true, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-]
-
-const testBoard5 = 
-[
-    [true, null, null, null, null, null],
-    [null, true, null, null, null, null],
-    [null, null, true, null, null, null],
     [null, null, null, true, null, null],
     [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-]
-
-const testBoard6 = 
-[
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, true, null, null],
-    [null, null, true, null, null, null],
-    [null, true, null, null, null, null],
-    [true, null, null, null, null, null],
-]
-
-const testBoard7 = 
-[
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, false, null, null],
-    [null, null, false, null, null, null],
     [null, false, null, null, null, null],
+    [true, null, null, null, null, null],
     [false, null, null, null, null, null],
+    [null, null, false, null, null, null],
+    [true, null, false, true, null, null],
 ]
 
-const testBoard8 = 
-[
-    [true, true, true, true, true, true],
-    [true, true, true, true, true, true],
-    [true, true, true, true, true, true],
-    [true, true, true, true, true, true],
-    [true, true, true, true, true, true],
-    [true, true, true, true, true, true],
-    [true, true, true, true, true, true],
-]
 
-const testBoard9 = 
-[
-    [false, false, false, false, false, false],
-    [false, false, false, false, false, false],
-    [false, false, false, false, false, false],
-    [false, false, false, false, false, false],
-    [false, false, false, false, false, false],
-    [false, false, false, false, false, false],
-    [false, false, false, false, false, false],
-]
 
-const testBoard10 = 
-[
-    [true, true, true, true, true, true],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-]
+//console.assert(getLinesOf2(testBoard1, true).length > 0)
+console.log(getNumLinesOf2(testBoard1, false))
 
-const testBoard11 = 
-[
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [true, null, null, null, null, null],
-    [true, null, null, null, null, null],
-]
+//###TESTED AND WORKS
+//returns lines of 2
+function getNumLinesOf2(board, player){
+    let linesOf2 = []
+    const width = board.length
+    const height = board[0].length
+    let duplicatedLinesCount = 0 //see canMakeLiningWin function
 
-console.log(getLinesOfN(testBoard11, 2, true))
+    //testing functions
+    const isExactly2PlayerDiscs = (line) => {
+        const numOfMatchingDiscs = line.reduce((accum, curr) => {
+            return curr === player ? accum + 1 : accum + 0
+        }, 0)
+
+        return numOfMatchingDiscs === 2
+    }
+
+    const isOnlyEmptyBetweenDiscs = (line) => {
+        for(let i = 1; i < line.length; i++){
+            if(line[i] === player){
+                return true
+            }
+            else if(line[i] === !player){
+                return false
+            }
+        }
+        return false //shouldn't get here because 2 discs should be guaranteed
+    }
+
+    const isNotLineOf3 = (line, contextSlots) => {
+        if(line[3] === player){
+            return true
+        }
+        else if(line[2] === player){
+            return contextSlots[0] !== player //if first context slot is anything but the player return true
+        }
+        else if(line[1] === player){
+            return contextSlots[0] !== player && contextSlots[1] !== player //same but with both context slots
+        }
+        
+        return false //shouldn't get here
+    }
+
+    const canMakeWinningLine = (line, contextSlots) => {
+        if(line[3] === player){
+            //this is used later to account for lines that follow the [t, _, _, t] pattern
+            //these lines should only be counted once so this number will be divided by two
+            //and subtracted from the total
+            //not elegant but would probably have to change the whole algoritm to be able to identify unique
+            //lines based on indices and prevent double counting that way
+            duplicatedLinesCount += 1 
+            return true //because in between slots are guaranteed to be empty
+        }
+        else if(line[2] === player){
+            return line[3] === null || contextSlots[0] === null //only need one of these slots to be empty
+        }
+        else if(line[1] === player){
+            //only need to test following slots and not preceding because lines are generated in all directions and I don't want the
+            //same line counted twice unless it can make two distinct lines of 4
+            const isBothFollowingEmpty = line[2] === null && line[3] === null
+            const isOneLeftAndOneRightEmpty = line[2] === null && contextSlots[0] === null
+
+            return isBothFollowingEmpty || 
+                   isOneLeftAndOneRightEmpty
+        }
+
+        return false //shouldn't make it here
+    }
+
+    //verification function that combines all the testing functions
+    const isLineOf2 = (line, contextSlots) => {
+        
+        return isExactly2PlayerDiscs(line) &&
+               isOnlyEmptyBetweenDiscs(line) &&
+               isNotLineOf3(line, contextSlots) &&
+               canMakeWinningLine(line, contextSlots)
+    }
+
+    for(let row = 0; row < width; row++){
+        for(let col = 0; col < height; col++){
+            const slot = board[row][col]
+
+            if(slot === player){
+
+                //look right
+                let lineToCheck = [slot,
+                                   row + 1 < 7 ? board[row + 1][col] : 'out of bounds',
+                                   row + 2 < 7 ? board[row + 2][col] : 'out of bounds',
+                                   row + 3 < 7 ? board[row + 3][col] : 'out of bounds']
+                
+                let contextSlots = [row - 1 >= 0 ? board[row - 1][col] : 'out of bounds',
+                                    row - 2 >= 0 ? board[row - 2][col] : 'out of bounds']
+                                      
+                if(isLineOf2(lineToCheck, contextSlots)){
+                    linesOf2.push(lineToCheck)
+                }
+
+                //look up
+                lineToCheck = [slot,
+                               col + 1 < 6 ? board[row][col + 1] : 'out of bounds',
+                               col + 2 < 6 ? board[row][col + 2] : 'out of bounds',
+                               col + 3 < 6 ? board[row][col + 3] : 'out of bounds']
+
+                contextSlots = [col - 1 >= 0 ? board[row][col - 1] : 'out of bounds',
+                                col - 2 >= 0 ? board[row][col - 2] : 'out of bounds']
+                     
+                if(isLineOf2(lineToCheck, contextSlots)){
+                    linesOf2.push(lineToCheck)
+                }
+
+                //look left
+                lineToCheck = [slot,
+                               row - 1 >= 0 ? board[row - 1][col] : 'out of bounds',
+                               row - 2 >= 0 ? board[row - 2][col] : 'out of bounds',
+                               row - 3 >= 0 ? board[row - 3][col] : 'out of bounds']
+
+                contextSlots = [row + 1 < 7 ? board[row + 1][col] : 'out of bounds',
+                                row + 2 < 7 ? board[row + 2][col] : 'out of bounds']
+                     
+                if(isLineOf2(lineToCheck, contextSlots)){
+                    linesOf2.push(lineToCheck)
+                }
+
+                //look down
+                lineToCheck = [slot,
+                               col - 1 >= 0 ? board[row][col - 1] : 'out of bounds',
+                               col - 2 >= 0 ? board[row][col - 2] : 'out of bounds',
+                               col - 3 >= 0 ? board[row][col - 3] : 'out of bounds']
+
+                contextSlots = [col + 1 < 6 ? board[row][col + 1] : 'out of bounds',
+                                col + 2 < 6 ? board[row][col + 2] : 'out of bounds']
+                    
+                if(isLineOf2(lineToCheck, contextSlots)){
+                    linesOf2.push(lineToCheck)
+                }
+
+                //look up & right
+                lineToCheck = [slot,
+                               row + 1 < 7 && col + 1 < 6 ? board[row + 1][col + 1] : 'out of bounds',
+                               row + 2 < 7 && col + 2 < 6 ? board[row + 2][col + 2] : 'out of bounds',
+                               row + 3 < 7 && col + 3 < 6 ? board[row + 3][col + 3] : 'out of bounds']
+
+                contextSlots = [row - 1 >= 0 && col - 1 >= 0 ? board[row - 1][col - 1] : 'out of bounds',
+                                row - 2 >= 0 && col - 2 >= 0 ? board[row - 2][col - 2] : 'out of bounds']
+         
+                if(isLineOf2(lineToCheck, contextSlots)){
+                    linesOf2.push(lineToCheck)
+                }
+
+                //look up & left
+                lineToCheck = [slot,
+                               row - 1 >= 0 && col + 1 < 6 ? board[row - 1][col + 1] : 'out of bounds',
+                               row - 2 >= 0 && col + 2 < 6 ? board[row - 2][col + 2] : 'out of bounds',
+                               row - 3 >= 0 && col + 3 < 6 ? board[row - 3][col + 3] : 'out of bounds']
+
+                contextSlots = [row + 1 < 7 && col - 1 >= 0 ? board[row + 1][col - 1] : 'out of bounds',
+                                row + 2 < 7 && col - 2 >= 0 ? board[row + 2][col - 2] : 'out of bounds']
+
+                if(isLineOf2(lineToCheck, contextSlots)){
+                    linesOf2.push(lineToCheck)
+                }
+
+                //look down & left
+                lineToCheck = [slot,
+                               row - 1 >= 0 && col - 1 >=0 ? board[row - 1][col - 1] : 'out of bounds',
+                               row - 2 >= 0 && col - 2 >=0 ? board[row - 2][col - 2] : 'out of bounds',
+                               row - 3 >= 0 && col - 3 >=0 ? board[row - 3][col - 3] : 'out of bounds']
+
+                contextSlots = [row + 1 < 7 && col + 1 < 6 ? board[row + 1][col + 1] : 'out of bounds',
+                                row + 2 < 7 && col + 2 < 6 ? board[row + 2][col + 2] : 'out of bounds']
+
+                if(isLineOf2(lineToCheck, contextSlots)){
+                    linesOf2.push(lineToCheck)
+                }
+
+                //look down & right
+                lineToCheck = [slot,
+                               row + 1 < 7 && col - 1 >=0 ? board[row + 1][col - 1] : 'out of bounds',
+                               row + 2 < 7 && col - 2 >=0 ? board[row + 2][col - 2] : 'out of bounds',
+                               row + 3 < 7 && col - 3 >=0 ? board[row + 3][col - 3] : 'out of bounds']
+
+                contextSlots = [row - 1 >= 0 && col + 1 < 6 ? board[row - 1][col + 1] : 'out of bounds',
+                                row - 2 >= 0 && col + 2 < 6 ? board[row - 2][col + 2] : 'out of bounds']
+
+                if(isLineOf2(lineToCheck, contextSlots)){
+                    linesOf2.push(lineToCheck)
+                }
+            }
+        }
+    }
+
+    return linesOf2.length - (duplicatedLinesCount / 2)
+}
+
+//TODO: getNumLinesOf3
 
 //return best column to drop disc in
-export function getBestMove(board){
+function getBestMove(board){
     let bestValue = Number.NEGATIVE_INFINITY
     let bestMove = undefined
 
@@ -157,7 +246,7 @@ export function getBestMove(board){
 
 //function returns max score it can find assuming other player is also
 //playing perfectly
-export function minimax(board, depth, isMaximizingPlayer){
+function minimax(board, depth, isMaximizingPlayer){
     //base case
     const gameOver = (getWinningSlots(board).length !== 0 || isBoardFull(board))
     if(depth === 0 || gameOver){
@@ -185,7 +274,7 @@ export function minimax(board, depth, isMaximizingPlayer){
 //###TESTED AND WORKS
 //returns winning slots (spaces) but can also be used
 //to test if there's a winner at all (array length will be 0 if no winner)
-export function getWinningSlots(board){
+function getWinningSlots(board){
     const height = board[0].length
     const width = board.length
     const emptySlot = null
@@ -248,7 +337,7 @@ export function getWinningSlots(board){
 
 //##TESTED AND WORKS
 //check every space and return true only if there are no empty spaces
-export function isBoardFull(board){
+function isBoardFull(board){
     for(let i = 0; i < board.length; i++){
         for(let j = 0; j < board[0].length; j++){
             if(board[i][j] === null){
@@ -262,7 +351,7 @@ export function isBoardFull(board){
 
 //##TESTED AND WORKS
 //returns every single possible next board from the current board position
-export function getChildPositions(board, isMaximizingPlayer){
+function getChildPositions(board, isMaximizingPlayer){
     let childPositions = []
 
     //for each column
@@ -291,7 +380,7 @@ export function getChildPositions(board, isMaximizingPlayer){
 }
 
 //returns an evaluation score total based upon board position
-export function evaluation(currentBoard, isMaximizingPlayer){
+function evaluation(currentBoard, isMaximizingPlayer){
     //score settings
     const centerColScore = 4
     const lineOf2Score = 2
@@ -330,81 +419,3 @@ export function evaluation(currentBoard, isMaximizingPlayer){
     return evalScore
 }
 
-//returns lines of 2 or 3 matching discs within 4 spaces of each other
-//depends on value of n
-export function getLinesOfN(board, n, player){
-    const height = board[0].length
-    const width = board.length
-    const emptySlot = null
-
-    let linesOfN = []
-
-    const isExactlyLineOfN = (line) => {
-        const numOfMatches = line.reduce((occurences, curr) => {
-            return curr === player ? occurences + 1 : occurences + 0
-        }, 0)
-
-        return numOfMatches === n
-    }
-
-    for(let row = 0; row < width; row++){
-        for(let col = 0; col < height; col++){
-            let slot = board[row][col]
-
-            if(slot === emptySlot){
-                continue //don't check starting from empty slots
-            }
-
-            if(slot !== player){
-                continue //don't check starting from opponent discs
-            }
-
-            if(col + (n - 1) < height){
-                const lineToCheck = [slot, //look right
-                                    board[row][col + 1], 
-                                    col + 2 <= 7 ? board[row][col + 2] : null, 
-                                    col + 3 <= 7 ? board[row][col + 3] : null]
-                
-                if(isExactlyLineOfN(lineToCheck)){
-                    linesOfN.push(lineToCheck)
-                }
-            }
-
-            if(row + (n - 1) < width){
-
-                const lineToCheck = [slot, //look up
-                                    board[row + 1][col],
-                                    row + 2 <= 6 ? board[row + 2][col] : null,
-                                    row + 3 <= 6 ? board[row + 3][col] : null]
-                
-                if(isExactlyLineOfN(lineToCheck)){
-                    linesOfN.push(lineToCheck)
-                }
-
-                if(col + (n - 1) < height && slot){
-                    const lineToCheck = [slot, //look up & right
-                                        board[row + 1][col + 1],
-                                        (col + 2 <= 7) && (row + 2 <= 6) ? board[row + 2][col + 2] : null,
-                                        (col + 3 <= 7) && (row + 3 <= 6) ? board[row + 3][col + 3] : null]
-                
-                    if(isExactlyLineOfN(lineToCheck)){
-                        linesOfN.push(lineToCheck)
-                    }
-                }
-
-                if(col - 3 >= 0 && slot){
-                    const lineToCheck = [slot, //look up & left
-                                        board[row + 1][col - 1],
-                                        (col - 2 >= 0) && (row + 2 <= 6) ? board[row + 2][col - 2] : null,
-                                        (col -3 >= 0) && (row + 2 <= 6) ? board[row + 3][col - 3] : null]
-                
-                    if(isExactlyLineOfN(lineToCheck)){
-                        linesOfN.push(lineToCheck)
-                    }
-                }
-            }
-        }
-    }
-
-    return linesOfN
-}
