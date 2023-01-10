@@ -25,22 +25,24 @@
 
 const testBoard1 = 
 [
-    [null, null, null, true, null, null],
     [null, null, null, null, null, null],
-    [null, false, null, null, null, null],
-    [true, null, null, null, null, null],
-    [false, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
     [null, null, false, null, null, null],
-    [true, null, false, true, null, null],
+    [null, null, null, false, null, null],
+    [null, null, null, null, false, null],
+    [null, null, null, null, null, true],
 ]
 
 
 
 //console.assert(getLinesOf2(testBoard1, true).length > 0)
-console.log(getNumLinesOf2(testBoard1, false))
+console.log(getNumLinesOf3(testBoard1, false))
 
 //###TESTED AND WORKS
-//returns lines of 2
+//returns the number of lines of 2 (used for position evaluation)
+//todo: it's possible that I made this function more complex than it needs to be
+//review at a future date
 function getNumLinesOf2(board, player){
     let linesOf2 = []
     const width = board.length
@@ -233,7 +235,147 @@ function getNumLinesOf2(board, player){
     return linesOf2.length - (duplicatedLinesCount / 2)
 }
 
-//TODO: getNumLinesOf3
+//###TESTED AND WORKS
+//return the number of lines of 3 (used for position evaluation)
+function getNumLinesOf3(board, player){
+    let linesOf3 = []
+    const width = board.length
+    const height = board[0].length
+
+    //testing functions
+    const isExactly3PlayerDiscs = (line) => {
+        const numOfMatchingDiscs = line.reduce((accum, curr) => {
+            return curr === player ? accum + 1 : accum + 0
+        }, 0)
+
+        return numOfMatchingDiscs === 3
+    }
+
+    const isEmptySpaceInLine = (line) => {
+        //verified if at least 1 space is a null (empty)
+        return line.some(slot => slot === null)
+    }
+
+    //function that combines testing functions
+    const isLineOf3 = (line) => {
+        return isExactly3PlayerDiscs(line) && isEmptySpaceInLine(line)
+    }
+
+    for(let row = 0; row < width; row++){
+        for(let col = 0; col < height; col++){
+            let slot = board[row][col]
+
+            if(slot === player){
+                //look right
+                let lineToCheck = [slot,
+                                   row + 1 < 7 ? board[row + 1][col] : 'out of bounds',
+                                   row + 2 < 7 ? board[row + 2][col] : 'out of bounds',
+                                   row + 3 < 7 ? board[row + 3][col] : 'out of bounds']
+
+                let contextSlots = [row - 1 >= 0 ? board[row - 1][col] : 'out of bounds',
+                                    row - 2 >= 0 ? board[row - 2][col] : 'out of bounds']
+                    
+                if(isLineOf3(lineToCheck)){
+                    linesOf3.push(lineToCheck)
+                }
+
+                //look up
+                lineToCheck = [slot,
+                               col + 1 < 6 ? board[row][col + 1] : 'out of bounds',
+                               col + 2 < 6 ? board[row][col + 2] : 'out of bounds',
+                               col + 3 < 6 ? board[row][col + 3] : 'out of bounds']
+
+                contextSlots = [col - 1 >= 0 ? board[row][col - 1] : 'out of bounds',
+                                col - 2 >= 0 ? board[row][col - 2] : 'out of bounds']
+          
+                if(isLineOf3(lineToCheck, contextSlots)){
+                    linesOf3.push(lineToCheck)
+                }
+
+                //look left
+                lineToCheck = [slot,
+                               row - 1 >= 0 ? board[row - 1][col] : 'out of bounds',
+                               row - 2 >= 0 ? board[row - 2][col] : 'out of bounds',
+                               row - 3 >= 0 ? board[row - 3][col] : 'out of bounds']
+
+                contextSlots = [row + 1 < 7 ? board[row + 1][col] : 'out of bounds',
+                                row + 2 < 7 ? board[row + 2][col] : 'out of bounds']
+                    
+                if(isLineOf3(lineToCheck, contextSlots)){
+                    linesOf3.push(lineToCheck)
+                }
+
+                //look down
+                lineToCheck = [slot,
+                               col - 1 >= 0 ? board[row][col - 1] : 'out of bounds',
+                               col - 2 >= 0 ? board[row][col - 2] : 'out of bounds',
+                               col - 3 >= 0 ? board[row][col - 3] : 'out of bounds']
+
+                contextSlots = [col + 1 < 6 ? board[row][col + 1] : 'out of bounds',
+                                col + 2 < 6 ? board[row][col + 2] : 'out of bounds']
+                    
+                if(isLineOf3(lineToCheck, contextSlots)){
+                    linesOf3.push(lineToCheck)
+                }
+
+                //look up & right
+                lineToCheck = [slot,
+                               row + 1 < 7 && col + 1 < 6 ? board[row + 1][col + 1] : 'out of bounds',
+                               row + 2 < 7 && col + 2 < 6 ? board[row + 2][col + 2] : 'out of bounds',
+                               row + 3 < 7 && col + 3 < 6 ? board[row + 3][col + 3] : 'out of bounds']
+
+                contextSlots = [row - 1 >= 0 && col - 1 >= 0 ? board[row - 1][col - 1] : 'out of bounds',
+                                row - 2 >= 0 && col - 2 >= 0 ? board[row - 2][col - 2] : 'out of bounds']
+
+                if(isLineOf3(lineToCheck, contextSlots)){
+                    linesOf3.push(lineToCheck)
+                }
+
+                //look up & left
+                lineToCheck = [slot,
+                               row - 1 >= 0 && col + 1 < 6 ? board[row - 1][col + 1] : 'out of bounds',
+                               row - 2 >= 0 && col + 2 < 6 ? board[row - 2][col + 2] : 'out of bounds',
+                               row - 3 >= 0 && col + 3 < 6 ? board[row - 3][col + 3] : 'out of bounds']
+
+                contextSlots = [row + 1 < 7 && col - 1 >= 0 ? board[row + 1][col - 1] : 'out of bounds',
+                                row + 2 < 7 && col - 2 >= 0 ? board[row + 2][col - 2] : 'out of bounds']
+
+                if(isLineOf3(lineToCheck, contextSlots)){
+                    linesOf3.push(lineToCheck)
+                }
+
+                //look down & left
+                lineToCheck = [slot,
+                               row - 1 >= 0 && col - 1 >=0 ? board[row - 1][col - 1] : 'out of bounds',
+                               row - 2 >= 0 && col - 2 >=0 ? board[row - 2][col - 2] : 'out of bounds',
+                               row - 3 >= 0 && col - 3 >=0 ? board[row - 3][col - 3] : 'out of bounds']
+
+                contextSlots = [row + 1 < 7 && col + 1 < 6 ? board[row + 1][col + 1] : 'out of bounds',
+                                row + 2 < 7 && col + 2 < 6 ? board[row + 2][col + 2] : 'out of bounds']
+
+                if(isLineOf3(lineToCheck, contextSlots)){
+                    linesOf3.push(lineToCheck)
+                }
+
+                //look down & right
+                lineToCheck = [slot,
+                               row + 1 < 7 && col - 1 >=0 ? board[row + 1][col - 1] : 'out of bounds',
+                               row + 2 < 7 && col - 2 >=0 ? board[row + 2][col - 2] : 'out of bounds',
+                               row + 3 < 7 && col - 3 >=0 ? board[row + 3][col - 3] : 'out of bounds']
+
+                contextSlots = [row - 1 >= 0 && col + 1 < 6 ? board[row - 1][col + 1] : 'out of bounds',
+                                row - 2 >= 0 && col + 2 < 6 ? board[row - 2][col + 2] : 'out of bounds']
+
+                if(isLineOf3(lineToCheck, contextSlots)){
+                    linesOf3.push(lineToCheck)
+                }
+            }
+        }
+    }
+
+
+    return linesOf3.length
+}
 
 //return best column to drop disc in
 function getBestMove(board){
