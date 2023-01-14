@@ -1,4 +1,5 @@
 import React from 'react'
+import { getBestMove, getWinningSlots, isBoardFull, isBoardEmpty } from '../utilities/ConnectFourUtil'
 import logo from '../assets/logo.svg'
 import Button from './Button'
 import Board from './Board'
@@ -7,6 +8,8 @@ import ColumnSelectButton from './ColumnSelectButton'
 import ResultDisplay from './ResultDisplay'
 
 export default function Game(props){
+
+    const aiDelay = 500 //delay between AI actions in milliseconds
 
     //board state initializes with null for empty spaces
     //later, spaces filled with true will represent the discs
@@ -37,15 +40,26 @@ export default function Game(props){
         //changing the turn without a drop)
         const isWin = getWinningSlots(board).length !== 0
 
-        if(board[selectedCol].includes(null) && !isWin && !isBoardEmpty(board)){
-            setIsPlayer1Turn(prevValue => !prevValue)
-        }
-
         //if there is a win or draw, the game is over
         if(isWin || isBoardFull(board)){
             setIsGameOver(prevValue => !prevValue)
         }
+
+        //change the player turn if the game isn't over
+        if(board[selectedCol].includes(null) && !isWin && !isBoardEmpty(board)){
+            setIsPlayer1Turn(prevValue => !prevValue)
+        }
+        
     }, [board])
+
+    //plays AI move when it's player2's turn
+    React.useEffect(() => {
+        //make the AI move if it's not player 1's turn (player 1 is always a human player)
+        if(!isPlayer1Turn){
+            console.log('play ai move?')
+            playAIMove(getBestMove(board, false))
+        }
+    }, [isPlayer1Turn])
 
     //function to take selected column as an index
     //and update the board state to represent a disc being
@@ -64,6 +78,9 @@ export default function Game(props){
                             : col
             })
         })
+
+        //reset selected column back to middle after move is made
+        setSelectedCol(3)
     }
 
     function handleColSelect(isMoveToLeft){
@@ -103,96 +120,6 @@ export default function Game(props){
         setIsGameOver(false)
     }
 
-    //algoritm from:
-    //https://codereview.stackexchange.com/a/127105
-    //this function can also be used to detect a winner
-    //by checking length of returned array
-    function getWinningSlots(board){
-        const height = board[0].length
-        const width = board.length
-        const emptySlot = null
-
-        for(let row = 0; row < width; row++){ 
-            for(let col = 0; col < height; col++){
-                let slot = board[row][col]
-
-                if(slot === emptySlot){
-
-                    continue //don't check starting from empty slots
-                }
-
-                if(col + 3 < height &&
-                    slot === board[row][col + 1] && //look right
-                    slot === board[row][col + 2] &&
-                    slot === board[row][col + 3]){
-                        return [[row, col],
-                                [row, col + 1], 
-                                [row, col + 2], 
-                                [row, col + 3]]
-                }
-
-                if(row + 3 < width){
-                    if(slot === board[row + 1][col] && //look up
-                       slot === board[row + 2][col] &&
-                       slot === board[row + 3][col]){
-                            return [[row, col], 
-                                    [row + 1, col], 
-                                    [row + 2, col], 
-                                    [row + 3, col]]
-                    }
-
-                    if(col + 3 < height &&
-                        slot === board[row + 1][col + 1] && //look up & right
-                        slot === board[row + 2][col + 2] &&
-                        slot === board[row + 3][col + 3]){
-                            return [[row, col],
-                                    [row + 1, col + 1], 
-                                    [row + 2, col + 2], 
-                                    [row + 3, col + 3]]
-                    }
-
-                    if(col - 3 >= 0 &&
-                        slot === board[row + 1][col - 1] && //look up & left
-                        slot === board[row + 2][col - 2] &&
-                        slot === board[row + 3][col - 3]){
-                            return [[row, col],
-                                    [row + 1, col - 1], 
-                                    [row + 2, col - 2], 
-                                    [row + 3, col - 3]]
-                    }
-                }
-            }
-        }
-
-        return [] //if no winning line, return no winning slots
-    }
-
-    //check every space and return true only if there are no empty spaces
-    function isBoardFull(board){
-        for(let i = 0; i < board.length; i++){
-            for(let j = 0; j < board[0].length; j++){
-                if(board[i][j] === null){
-                    return false
-                }
-            }
-        }
-
-        return true
-    }
-
-    function isBoardEmpty(board){
-        let isEmpty = true
-        for(let i = 0; i < board.length; i++){
-            for(let j = 0; j < board[0].length; j++){
-                if(board[i][j] !== null){
-                    isEmpty = false
-                }
-            }
-        }
-
-        return isEmpty
-    }
-
     function getBGToUse(isWinner, isPlayer1Turn){
         //3 possible backgrounds to use based upon state of game
         const playBG = 'bg-[url(/src/assets/bg-shape-mobile.svg)]'
@@ -208,6 +135,45 @@ export default function Game(props){
         else{
             return playBG
         }
+    }
+
+    //function takes in a column index (from getAIMove function)
+    //calls handleColSelect with delays so player can see what is happening
+    //then drops disc in column index
+    function playAIMove(colIndex){
+        //is passed to handleColSelect to move to left or right
+        //3 is the index of the center column
+        //in the case that AI move is the center column,
+        //handleColSelect will be called 0 times so left/right direction doesn't matter
+        const isMoveToLeft = colIndex <= 3
+        const colMoves = Math.abs(3 - colIndex)
+        
+        //custom wrapper that calls setInterval but limits it
+        //to N times and returns a promise that resolves when all calls are complete
+        //based on https://stackoverflow.com/a/2956980/20048656
+        function delayedColSelectN(callback, delay, repetitions, isMoveToLeft){
+            const intervalDone = new Promise((resolve, reject) => {
+                let i = 0
+                const intervalID = setInterval(() => {
+                    if(i === repetitions){
+                        clearInterval(intervalID)
+                        resolve('intervals complete')
+                    }
+
+                    callback(isMoveToLeft)
+
+                    i++
+                }, delay)
+            })
+
+            return intervalDone
+        }
+
+        delayedColSelectN(handleColSelect, aiDelay, colMoves, isMoveToLeft)
+            .then(() => {
+                setTimeout(handleDrop(colIndex, false), aiDelay)
+            })
+        
     }
     
     return (

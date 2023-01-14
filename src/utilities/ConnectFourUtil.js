@@ -25,29 +25,102 @@
 
 const testBoard1 = 
 [
-    [true, null, null, null, null, null],
-    [true, null, null, null, null, null],
-    [true, null, null, null, null, null],
-    [true, null, null, null, null, null],
-    [null, null, false, null, null, null],
-    [null, false, null, null, null, null],
+    [false, false, null, null, null, null],
     [false, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [true, false, null, null, null, null],
+    [true, true, null, null, null, null],
+    [true, true, true, false, true, false],
+    [false, true, false, true, false, true],
 ]
 
 
+//without pruning seems like largest depth I can go to is 4
+//console.log(getBestMove(testBoard1, true))
 
-getEvaluation(testBoard1, true)
+//## definitely NOT working
+//## utilize this function with actual interface to test
+//return best column to drop disc in
+export function getBestMove(board, isMaximizingPlayer){
+    let bestValue = Number.NEGATIVE_INFINITY
+    let bestMove = undefined
+
+    //for each column, 
+    //make move and run the minimax function on the resulting position
+    //only test cols that have an empty slot available
+    for(let i = 0; i < board.length; i++){
+        if(board[i].some(slot => slot === null)){
+            const move = makeMove(board, i, isMaximizingPlayer)
+            
+            let currVal = minimax(move, 4, isMaximizingPlayer)
+            bestValue = Math.max(currVal, bestValue)
+
+            if(currVal === bestValue){
+                bestMove = i //if this was the best move so far, set best move to current col
+            }
+        }
+    }
+    
+    return bestMove
+}
+
+//###Partially tested
+//###Will be easier to test once I'm using actual interface
+//function returns max score it can find assuming other player is also
+//playing perfectly
+function minimax(board, depth, isMaximizingPlayer){
+    //base case
+    const gameOver = (getWinningSlots(board).length !== 0 || isBoardFull(board))
+    if(depth === 0 || gameOver){
+        const finalEval = getEvaluation(board, isMaximizingPlayer)
+        return finalEval
+    }
+
+    if(isMaximizingPlayer){
+        let maxEval = Number.NEGATIVE_INFINITY
+        getChildPositions(board, true).forEach((childPos) => {
+            let currEval = minimax(childPos, depth - 1, false)
+            maxEval = Math.max(maxEval, currEval)
+        })
+        return maxEval
+    }
+    else{
+        let minEval = Number.POSITIVE_INFINITY
+        getChildPositions(board, false).forEach((childPos) => {
+            let currEval = minimax(childPos, depth - 1, true)
+            minEval = Math.min(minEval, currEval)
+        })
+        return minEval
+    }
+}
+
+//###TESTED AND WORKS
+//takes a column to drop disk in
+//returns position after move
+function makeMove(board, colToDropIn, isMaximizingPlayer){
+    return board.map((col, index) => {
+        const isNull = (element) => element === null
+        const firstNullIndex = col.findIndex(isNull)
+        return index === colToDropIn ?
+                    col.map((space, index) => {
+                        return index === firstNullIndex ? isMaximizingPlayer : space
+                    })  
+                    : col
+    })
+}
 
 //###TESTED AND WORKS
 //returns an evaluation score total based upon board position
-function getEvaluation(board, isMaximizingPlayer){
+//evaluates positive for player that goes first and negative for second
+function getEvaluation(board){
     //score settings
-    const centerColScore = 4
+    const centerColScore = 5
     const lineOf2Score = 2
     const lineOf3Score = 5
     const winScore = 100000 //arbitrarily large to make other scoring irrelevant
     const oppLineOf2Score = -2
     const oppLineOf3Score = -100
+    const oppWinScore = -100000
 
     let evalScore = 0
 
@@ -56,82 +129,46 @@ function getEvaluation(board, isMaximizingPlayer){
     //use indices from winning slots
     const winningPlayer = winningSlots.length > 0 ? board[winningSlots[0][0]][winningSlots[0][1]] : null
     //update score and return immediately (no need to do anymore evaluation)
-    if(winningSlots.length !== 0 && winningPlayer === isMaximizingPlayer){
-        console.log('Win!')
-        evalScore += winScore
+    if(winningSlots.length !== 0){
+        if(winningPlayer){
+            evalScore += winScore
+        }
+        else{
+            evalScore += oppWinScore
+        }
         return evalScore
     }
 
     //check center column for player discs
     const discsInCenter = board[3].reduce((occurences, curr) => {
-        return curr === isMaximizingPlayer ? occurences + 1 : occurences + 0
+        return curr ? occurences + 1 : occurences + 0
     }, 0)
 
     //discs in center column?
-    console.log('Discs in center: ', discsInCenter)
     evalScore += discsInCenter * centerColScore
 
     //lines of 2?
-    console.log('Lines of 2: ', getNumLinesOf2(board, isMaximizingPlayer))
-    evalScore += getNumLinesOf2(board, isMaximizingPlayer) * lineOf2Score
+    evalScore += getNumLinesOf2(board, true) * lineOf2Score
 
     //lines of 3?
-    console.log('Lines of 3: ', getNumLinesOf3(board, isMaximizingPlayer))
-    evalScore += getNumLinesOf3(board, isMaximizingPlayer) * lineOf3Score
+    evalScore += getNumLinesOf3(board, true) * lineOf3Score
 
     //opp line of two?
-    console.log('Opp Lines of 2: ', getNumLinesOf2(board, !isMaximizingPlayer))
-    evalScore += getNumLinesOf2(board, !isMaximizingPlayer) * oppLineOf2Score
+    evalScore += getNumLinesOf2(board, false) * oppLineOf2Score
 
     //opp line of three?
-    console.log('Opp Lines of 3: ', getNumLinesOf3(board, !isMaximizingPlayer))
-    evalScore += getNumLinesOf3(board, !isMaximizingPlayer) * oppLineOf3Score
+    evalScore += getNumLinesOf3(board, false) * oppLineOf3Score
 
     //return final eval score
-    console.log('Final score: ', evalScore)
     return evalScore
-}
-
-//return best column to drop disc in
-function getBestMove(board){
-    let bestValue = Number.NEGATIVE_INFINITY
-    let bestMove = undefined
-
-    //for each column, run the minimax function and return col with optimum value
-    //only test columns that have an empty space still available
-}
-
-//function returns max score it can find assuming other player is also
-//playing perfectly
-function minimax(board, depth, isMaximizingPlayer){
-    //base case
-    const gameOver = (getWinningSlots(board).length !== 0 || isBoardFull(board))
-    if(depth === 0 || gameOver){
-        return evaluation(board, isMaximizingPlayer)
-    }
-
-    if(isMaximizingPlayer){
-        let maxEval = Number.NEGATIVE_INFINITY
-        getChildPositions(board).forEach((childPos) => {
-            let currEval = minimax(childPos, depth - 1, !isMaximizingPlayer)
-            maxEval = Math.max(maxEval, currEval)
-        })
-        return maxEval
-    }
-    else{
-        let minEval = Number.POSITIVE_INFINITY
-        getChildPositions(board).forEach((childPos) => {
-            let currEval = minimax(childPos, depth - 1, !isMaximizingPlayer)
-            minEval = Math.min(minEval, currEval)
-        })
-        return minEval
-    }
 }
 
 //###TESTED AND WORKS
 //returns winning slots (spaces) but can also be used
 //to test if there's a winner at all (array length will be 0 if no winner)
-function getWinningSlots(board){
+//algoritm from:
+//https://codereview.stackexchange.com/a/127105
+export function getWinningSlots(board){
     const height = board[0].length
     const width = board.length
     const emptySlot = null
@@ -193,7 +230,7 @@ function getWinningSlots(board){
 
 //##TESTED AND WORKS
 //check every space and return true only if there are no empty spaces
-function isBoardFull(board){
+export function isBoardFull(board){
     for(let i = 0; i < board.length; i++){
         for(let j = 0; j < board[0].length; j++){
             if(board[i][j] === null){
@@ -203,6 +240,21 @@ function isBoardFull(board){
     }
 
     return true
+}
+
+//##TESTED AND WORKS
+//check every space and return true only if there are only empty spaces
+export function isBoardEmpty(board){
+    let isEmpty = true
+    for(let i = 0; i < board.length; i++){
+        for(let j = 0; j < board[0].length; j++){
+            if(board[i][j] !== null){
+                isEmpty = false
+            }
+        }
+    }
+
+    return isEmpty
 }
 
 //##TESTED AND WORKS
