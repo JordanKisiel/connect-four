@@ -1,5 +1,5 @@
 import React from 'react'
-import { getBestMove, getWinningSlots, isBoardFull, isBoardEmpty } from '../utilities/ConnectFourUtil'
+import { getAIMove, getWinningSlots, isBoardFull, isBoardEmpty } from '../utilities/ConnectFourUtil'
 import logo from '../assets/logo.svg'
 import Button from './Button'
 import Board from './Board'
@@ -46,7 +46,7 @@ export default function Game(props){
         }
 
         //change the player turn if the game isn't over
-        if(board[selectedCol].includes(null) && !isWin && !isBoardEmpty(board)){
+        if(!isWin && !isBoardEmpty(board)){
             setIsPlayer1Turn(prevValue => !prevValue)
         }
         
@@ -57,9 +57,9 @@ export default function Game(props){
         //make the AI move if it's not player 1's turn (player 1 is always a human player)
         if(!isPlayer1Turn){
             console.log('play ai move?')
-            playAIMove(getBestMove(board, false))
+            playAIMove(getAIMove(board))
         }
-    }, [isPlayer1Turn])
+    }, [isPlayer1Turn, isPlayer1First])
 
     //function to take selected column as an index
     //and update the board state to represent a disc being
@@ -67,20 +67,23 @@ export default function Game(props){
     //true = first player disc
     //false = second player disc
     function handleDrop(selectedColIndex, isFirstPlayerDisc){
-        setBoard(prevBoard => {
-            return prevBoard.map((col, index) => {
-                const isNull = (element) => element === null
-                const firstNullIndex = col.findIndex(isNull)
-                return index === selectedColIndex ?
-                            col.map((space, index) => {
-                                return index === firstNullIndex ? isFirstPlayerDisc : space
-                            })  
-                            : col
+        //only drop in that column if there's an open slot
+        if(board[selectedColIndex].some(slot => slot === null)){
+            setBoard(prevBoard => {
+                return prevBoard.map((col, index) => {
+                    const isNull = (element) => element === null
+                    const firstNullIndex = col.findIndex(isNull)
+                    return index === selectedColIndex ?
+                                col.map((space, index) => {
+                                    return index === firstNullIndex ? isFirstPlayerDisc : space
+                                })  
+                                : col
+                })
             })
-        })
 
-        //reset selected column back to middle after move is made
-        setSelectedCol(3)
+            //reset selected column back to middle after move is made
+            setSelectedCol(3)
+        }
     }
 
     function handleColSelect(isMoveToLeft){
@@ -221,12 +224,12 @@ export default function Game(props){
                 <div className="w-full flex justify-between items-center mb-12">
                     <ColumnSelectButton
                         isLeft={true}
-                        handleColSelect={handleColSelect}
+                        handleColSelect={isPlayer1Turn ? handleColSelect : () => { /* do nothing */ }}
                         isPlayer1Turn={isPlayer1Turn}
                     />
                     <ColumnSelectButton
                         isLeft={false}
-                        handleColSelect={handleColSelect}
+                        handleColSelect={isPlayer1Turn ? handleColSelect : () => { /* do nothing */ }}
                         isPlayer1Turn={isPlayer1Turn}
                     />
                 </div>
@@ -239,7 +242,7 @@ export default function Game(props){
                     textAlign="text-center"
                     textDisplay="Drop!"
                     bgImage=""
-                    handleDrop={() => handleDrop(selectedCol, isPlayer1Turn)}
+                    handleDrop={isPlayer1Turn ? () => handleDrop(selectedCol, isPlayer1Turn) : () => { /* do nothing */ }}
                 />
             }
 

@@ -1,7 +1,6 @@
 /*
     Algorithm pseudo-code
 
-
     function minimax(position, depth, maximizingPlayer)
         //base case
         if depth === 0 OR game over in position
@@ -35,32 +34,62 @@ const testBoard1 =
 ]
 
 
-//without pruning seems like largest depth I can go to is 4
-//console.log(getBestMove(testBoard1, true))
-
-//## definitely NOT working
-//## utilize this function with actual interface to test
-//return best column to drop disc in
-export function getBestMove(board, isMaximizingPlayer){
-    let bestValue = Number.NEGATIVE_INFINITY
-    let bestMove = undefined
+//without pruning seems like largest depth I can go to is 4 but 3 is good enough for a challenge
+//there still seems to be some quirks where the AI will sometimes miss wins on its move
+//or prefer to block the human player rather than ensure its win
+//could create some test boards and walk through my code to try to figure out these quirks but
+//for now I don't mind them as they make the AI feel more human
+export function getAIMove(board){
+    const depth = 3
 
     //for each column, 
     //make move and run the minimax function on the resulting position
     //only test cols that have an empty slot available
-    for(let i = 0; i < board.length; i++){
-        if(board[i].some(slot => slot === null)){
-            const move = makeMove(board, i, isMaximizingPlayer)
-            
-            let currVal = minimax(move, 4, isMaximizingPlayer)
-            bestValue = Math.max(currVal, bestValue)
+    let bestMove = undefined
 
-            if(currVal === bestValue){
-                bestMove = i //if this was the best move so far, set best move to current col
+    let bestValue = Number.POSITIVE_INFINITY
+
+    //compares two board positions after a move
+    //the column with non-equal number of discs is the last move that occured
+    function getLastMove(prevBoard, currBoard){
+        let lastMove = 0
+        for(let i = 0; i < prevBoard.length; i++){
+            const prevNumOfDiscs = prevBoard[i].reduce((accum, curr) => {
+                return curr !== null ? accum + 1 : accum + 0
+            }, 0)
+
+            const currNumOfDiscs = currBoard[i].reduce((accum, curr) => {
+                return curr !== null ? accum + 1 : accum + 0
+            }, 0)
+
+            if(prevNumOfDiscs !== currNumOfDiscs){
+                lastMove = i
             }
         }
+
+        return lastMove
     }
+
+    getChildPositions(board, false).forEach((childPos) => {
+        
+        //console.log('child position: ', childPos)
+
+        let currVal = minimax(childPos, depth, true)
+        
+        //console.log('currValue: ', currVal)
+        
+        bestValue = Math.min(currVal, bestValue)
+
+        //console.log('bestValue: ', bestValue)
+
+        if(currVal === bestValue){
+            bestMove = getLastMove(board, childPos) //if this was the best move so far, set best move to current col
+            //console.log('board pos: ', board, 'child pos: ', childPos, 'best move: ', bestMove)
+        }
+    })
     
+    //console.log('best move: ', bestMove)
+
     return bestMove
 }
 
@@ -72,22 +101,25 @@ function minimax(board, depth, isMaximizingPlayer){
     //base case
     const gameOver = (getWinningSlots(board).length !== 0 || isBoardFull(board))
     if(depth === 0 || gameOver){
-        const finalEval = getEvaluation(board, isMaximizingPlayer)
+        const finalEval = getEvaluation(board)
+        //console.log('final eval: ', finalEval)
         return finalEval
     }
 
     if(isMaximizingPlayer){
         let maxEval = Number.NEGATIVE_INFINITY
         getChildPositions(board, true).forEach((childPos) => {
-            let currEval = minimax(childPos, depth - 1, false)
+            const currEval = minimax(childPos, depth - 1, false)
             maxEval = Math.max(maxEval, currEval)
         })
         return maxEval
     }
     else{
         let minEval = Number.POSITIVE_INFINITY
+        //console.log('board pre-child position: ', board)
         getChildPositions(board, false).forEach((childPos) => {
-            let currEval = minimax(childPos, depth - 1, true)
+            //console.log('child pos: ', childPos)
+            const currEval = minimax(childPos, depth - 1, true)
             minEval = Math.min(minEval, currEval)
         })
         return minEval
@@ -109,16 +141,18 @@ function makeMove(board, colToDropIn, isMaximizingPlayer){
     })
 }
 
+
 //###TESTED AND WORKS
 //returns an evaluation score total based upon board position
 //evaluates positive for player that goes first and negative for second
 function getEvaluation(board){
     //score settings
-    const centerColScore = 5
+    const centerColScore = 4
     const lineOf2Score = 2
     const lineOf3Score = 5
     const winScore = 100000 //arbitrarily large to make other scoring irrelevant
-    const oppLineOf2Score = -2
+    const oppCenterColScore = -4
+    const oppLineOf2Score = -6
     const oppLineOf3Score = -100
     const oppWinScore = -100000
 
@@ -139,19 +173,27 @@ function getEvaluation(board){
         return evalScore
     }
 
-    //check center column for player discs
-    const discsInCenter = board[3].reduce((occurences, curr) => {
+    //check center column for player 1 discs
+    const player1DiscsInCenter = board[3].reduce((occurences, curr) => {
         return curr ? occurences + 1 : occurences + 0
     }, 0)
 
+    //check center column for player 2 discs
+    const player2DiscsInCenter = board[3].reduce((occurences, curr) => {
+        return curr === false ? occurences + 1 : occurences + 0
+    }, 0)
+
     //discs in center column?
-    evalScore += discsInCenter * centerColScore
+    evalScore += player1DiscsInCenter * centerColScore
 
     //lines of 2?
     evalScore += getNumLinesOf2(board, true) * lineOf2Score
 
     //lines of 3?
     evalScore += getNumLinesOf3(board, true) * lineOf3Score
+
+    //opp disc in center column?
+    evalScore += player2DiscsInCenter * oppCenterColScore
 
     //opp line of two?
     evalScore += getNumLinesOf2(board, false) * oppLineOf2Score
@@ -161,7 +203,7 @@ function getEvaluation(board){
 
     //return final eval score
     return evalScore
-}
+} 
 
 //###TESTED AND WORKS
 //returns winning slots (spaces) but can also be used
