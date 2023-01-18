@@ -57,7 +57,7 @@ export default function Game(props){
         //make the AI move if it's not player 1's turn (player 1 is always a human player)
         if(!isPlayer1Turn){
             console.log('play ai move?')
-            playAIMove(getAIMove(board))
+            playAIMove(getAIMove(board, props.difficulty))
         }
     }, [isPlayer1Turn, isPlayer1First])
 
@@ -201,7 +201,11 @@ export default function Game(props){
                     bgColor="bg-purple-500" 
                     textColor="text-neutral-100" 
                     paddingX="px-8"
-                    handleDisplay={props.handleDisplay} 
+                    handlerFunction={() => {
+                            props.handleDisplay('main-menu')
+                            props.handleChooseDifficulty('')
+                        }
+                    } 
                 />
                 <img className="absolute left-1/2 -translate-x-1/2" src={logo} alt="logo" />
                 <Button 
@@ -209,7 +213,7 @@ export default function Game(props){
                     bgColor="bg-purple-500" 
                     textColor="text-neutral-100" 
                     paddingX="px-6" 
-                    handleRestart={handleRestart}
+                    handlerFunction={handleRestart}
                 />
             </div>
 
@@ -242,7 +246,7 @@ export default function Game(props){
                     textAlign="text-center"
                     textDisplay="Drop!"
                     bgImage=""
-                    handleDrop={isPlayer1Turn ? () => handleDrop(selectedCol, isPlayer1Turn) : () => { /* do nothing */ }}
+                    handlerFunction={isPlayer1Turn ? () => handleDrop(selectedCol, isPlayer1Turn) : () => { /* do nothing */ }}
                 />
             }
 

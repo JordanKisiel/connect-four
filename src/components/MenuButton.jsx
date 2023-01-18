@@ -4,7 +4,7 @@ export default function MenuButton(props){
     
     return (
         <button
-            onClick={props.handleDisplay || props.handleDrop} 
+            onClick={props.handlerFunction}
             className={`
                 ${props.bgColor} 
                 ${props.textColor} 

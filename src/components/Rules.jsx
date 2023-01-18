@@ -3,7 +3,7 @@ import React from 'react'
 export default function Rules(props){
 
     return (
-        <div className="h-[100vh] flex flex-col items-center justify-center p-4">
+        <div className="h-[100vh] flex flex-col items-center justify-center p-4 mx-auto sm:max-w-xl">
             <div className="relative bg-neutral-100 shadow-2xl border-[3px] border-neutral-900 rounded-[40px] px-6 pt-12 pb-16 space-y-10 flex flex-col items-center">
                 <h2 className="text-6xl font-bold uppercase">Rules</h2>
                 <div className="space-y-4">

@@ -1,37 +1,96 @@
-/*
-    Algorithm pseudo-code
+//AI that accepts 3 difficulty settings and chooses from
+//the top 3 ranked moves given by minimax algorithm
+//three difficulties choose from the top 3 moves
+//with different frequencies
+//difficulty should be 'easy', 'medium', or 'hard'
+//after some tuning, it makes more sense just to choose from
+//the top 2 moves because in the early game it's too easy to lose to
+//2nd or third best moves
+//could make eval function more sophisticated by rewarding placement more towards
+//central columns
+export function getAIMove(board, difficulty){
+    const depth = 3
 
-    function minimax(position, depth, maximizingPlayer)
-        //base case
-        if depth === 0 OR game over in position
-            return static evaluation of position
+    //array of child positions and their associated eval scores
+    //will be limited to best 3 positions by score
+    let best3Moves = [[0, Number.POSITIVE_INFINITY], [0, Number.POSITIVE_INFINITY], [0, Number.POSITIVE_INFINITY]]
+
+    let chosenMove = undefined
+
+    //compares two board positions after a move
+    //the column with non-equal number of discs is the last move that occured
+    function getLastMove(prevBoard, currBoard){
+        let lastMove = 0
+        for(let i = 0; i < prevBoard.length; i++){
+            const prevNumOfDiscs = prevBoard[i].reduce((accum, curr) => {
+                return curr !== null ? accum + 1 : accum + 0
+            }, 0)
+
+            const currNumOfDiscs = currBoard[i].reduce((accum, curr) => {
+                return curr !== null ? accum + 1 : accum + 0
+            }, 0)
+
+            if(prevNumOfDiscs !== currNumOfDiscs){
+                lastMove = i
+            }
+        }
+
+        return lastMove
+    }
+
+    getChildPositions(board, false).forEach((childPos) => {
+
+        let score = minimax(childPos, depth, true)
         
-        if maximizingPlayer
-            maxEval = -infinity
-            for each child of position
-                eval = minimax(child, depth - 1, false)
-                maxEval = max(maxEval, eval)
-            return maxEval
-        
-        else
-            minEval = +infinity
-            for each child of position
-                eval = minimax(child, depth - 1, true)
-                minEval = min(minEval, eval)
-            return minEval
+        //compare score to scores of best positions so far
+        for(let i = 0; i < best3Moves.length; i++){
+            if(score < best3Moves[i][1]){
+                best3Moves.splice(i, 0, [childPos, score]) //add position to best 3 moves
+                best3Moves.pop() //get rid of the extraneous position
+                break //only want to replace one score
+            }
+        }
+    })
 
-*/
+    const rand = Math.random()
+    if(difficulty === 'easy'){
+        if(rand < 0){ //for now, leaving this option although it will never be chosen incase I fine tune some more
+            chosenMove = getLastMove(board, best3Moves[2][0])
+        }
+        else if(rand < 0.40){
+            chosenMove = getLastMove(board, best3Moves[1][0])
+        }
+        else{
+            chosenMove = getLastMove(board, best3Moves[0][0])
+        }
+    }
 
-const testBoard1 = 
-[
-    [false, false, null, null, null, null],
-    [false, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [true, false, null, null, null, null],
-    [true, true, null, null, null, null],
-    [true, true, true, false, true, false],
-    [false, true, false, true, false, true],
-]
+    if(difficulty === 'medium'){
+        if(rand < 0){
+            chosenMove = getLastMove(board, best3Moves[2][0])
+        }
+        else if(rand < 0.25){
+            chosenMove = getLastMove(board, best3Moves[1][0])
+        }
+        else{
+            chosenMove = getLastMove(board, best3Moves[0][0])
+        }
+    
+    }
+    if(difficulty === 'hard'){
+        if(rand < 0){
+            chosenMove = getLastMove(board, best3Moves[2][0])
+        }
+        else if(rand < 0.15){
+            chosenMove = getLastMove(board, best3Moves[1][0])
+        }
+        else{
+            chosenMove = getLastMove(board, best3Moves[0][0])
+        }
+    }
+
+    return chosenMove
+}
 
 
 //without pruning seems like largest depth I can go to is 4 but 3 is good enough for a challenge
@@ -39,12 +98,9 @@ const testBoard1 =
 //or prefer to block the human player rather than ensure its win
 //could create some test boards and walk through my code to try to figure out these quirks but
 //for now I don't mind them as they make the AI feel more human
-export function getAIMove(board){
+export function getBestAIMove(board){
     const depth = 3
 
-    //for each column, 
-    //make move and run the minimax function on the resulting position
-    //only test cols that have an empty slot available
     let bestMove = undefined
 
     let bestValue = Number.POSITIVE_INFINITY
@@ -93,7 +149,7 @@ export function getAIMove(board){
     return bestMove
 }
 
-//###Partially tested
+//###Partially tested, seems to lead to correct moves based on evaluation
 //###Will be easier to test once I'm using actual interface
 //function returns max score it can find assuming other player is also
 //playing perfectly

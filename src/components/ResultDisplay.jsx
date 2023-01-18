@@ -39,7 +39,7 @@ export default function ResultDisplay(props){
                 bgColor="bg-purple-500"
                 textColor="text-neutral-100"
                 paddingX="px-7"
-                handleNewGame={props.handleNewGame}
+                handlerFunction={props.handleNewGame}
                 textDisplay="Play Again"
             />
         </div>
