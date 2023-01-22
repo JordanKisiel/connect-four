@@ -25,9 +25,9 @@ export default function Space(props){
     })
 
     return (
-        <div className="-z-10 relative">
-            {isWinningSlot && <img className="z-10 absolute w-1/2 left-1/4 top-1/4" src={winningMark} /> }
-            <img src={counter} />
+        <div className="flex justify-center items-center relative aspect-square">
+            {isWinningSlot && <img className="absolute w-[40%] left-[50%] -translate-x-[50%] top-[27%]" src={winningMark} /> }
+            <img className='w-[80%]' src={counter} />
         </div>
     )
 }

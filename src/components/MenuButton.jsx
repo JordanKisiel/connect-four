@@ -19,8 +19,7 @@ export default function MenuButton(props){
                 uppercase
                 bg-no-repeat
                 bg-[center_right_1rem]
-                py-5
-                px-5
+                ${props.padding || 'p-5'}
                 w-full
             `}
         >

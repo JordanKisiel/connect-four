@@ -24,12 +24,12 @@ export default function Board(props){
 
     return (
         <>
-            <div className="relative w-full aspect-square">
-                <img className="absolute top-0 border-neutral-900 border-2 rounded-3xl shadow-2xl" src={board} alt="board" />
-                <div className="absolute top-[0.60rem] left-[0.67rem] grid grid-cols-7 gap-[0.52rem]">
+            <div className="relative w-full aspect-square md:w-[80%]">
+                <img className="absolute top-1 rounded-3xl" src={boardBG} alt="board" />
+                <div className="absolute w-[98%] left-[50%] -translate-x-[50%] aspect-square grid grid-cols-7">
                     { columns }
                 </div>
-                <img className="absolute top-1 border-neutral-900 border-2 rounded-3xl -z-20" src={boardBG} alt="board" />
+                <img className="absolute top-0 rounded-3xl shadow-2xl" src={board} alt="board" />
             </div>
         </>
     )

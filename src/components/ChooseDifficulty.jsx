@@ -4,7 +4,7 @@ import MenuButton from './MenuButton'
 export default function ChooseDifficulty(props){
 
     return (
-        <div className='flex justify-between items-center'>
+        <div className='flex justify-between items-center gap-5'>
             <MenuButton
                 handlerFunction={() => {
                         props.handleChooseDifficulty('easy')
@@ -16,6 +16,7 @@ export default function ChooseDifficulty(props){
                 bgImage=''
                 textAlign='text-center'
                 textDisplay='Easy'
+                padding='p-3'
             />
             <MenuButton
                 handlerFunction={() => {
@@ -28,6 +29,7 @@ export default function ChooseDifficulty(props){
                 bgImage=''
                 textAlign='text-center'
                 textDisplay='Medium'
+                padding='p-3'
             />
             <MenuButton
                 handlerFunction={() => {
@@ -40,6 +42,7 @@ export default function ChooseDifficulty(props){
                 bgImage=''
                 textAlign='text-center'
                 textDisplay='Hard'
+                padding='p-3'
             />    
         </div>
     )

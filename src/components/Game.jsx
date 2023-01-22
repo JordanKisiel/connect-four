@@ -182,17 +182,25 @@ export default function Game(props){
     return (
         <div 
             className={
-                `relative 
-                h-[100vh] 
+                `relative
+                h-full
                 flex 
                 flex-col 
                 items-center 
                 px-4 
                 pt-16 
-                ${getBGToUse(getWinningSlots(board).length !== 0, isPlayer1Turn)} 
-                bg-no-repeat 
-                bg-contain 
-                bg-bottom`
+                ${getBGToUse(getWinningSlots(board).length !== 0, isPlayer1Turn)}
+                bg-bottom
+                bg-[length:100%_30%] 
+                bg-no-repeat
+                w-[90%]
+                mx-auto
+                sm:max-w-[30rem]
+                md:w-[80%]
+                md:max-w-[40rem]
+                md:pt-12
+                md:bg-[length:38rem_20rem]
+                `
                 }
         >
             <div className="relative w-full flex justify-between items-center mb-32">
@@ -223,32 +231,35 @@ export default function Game(props){
                 isPlayer1Turn={isPlayer1Turn}
                 winningSlots={getWinningSlots(board)}
             />
+            
+            <div className='w-full md:w-[80%]'>
+                {!isGameOver &&
+                    <div className="w-full flex justify-between items-center mb-12 sm:mb-9 md:mb-8 lg:mb-6">
+                        <ColumnSelectButton
+                            isLeft={true}
+                            handleColSelect={isPlayer1Turn ? handleColSelect : () => { /* do nothing */ }}
+                            isPlayer1Turn={isPlayer1Turn}
+                        />
+                        
+                        <ColumnSelectButton
+                            isLeft={false}
+                            handleColSelect={isPlayer1Turn ? handleColSelect : () => { /* do nothing */ }}
+                            isPlayer1Turn={isPlayer1Turn}
+                        />
+                    </div>
+                }
 
-            {!isGameOver &&
-                <div className="w-full flex justify-between items-center mb-12">
-                    <ColumnSelectButton
-                        isLeft={true}
-                        handleColSelect={isPlayer1Turn ? handleColSelect : () => { /* do nothing */ }}
-                        isPlayer1Turn={isPlayer1Turn}
+                {!isGameOver &&
+                    <MenuButton 
+                        bgColor={isPlayer1Turn ? "bg-red-300" : "bg-yellow-300"}
+                        textColor={isPlayer1Turn ? "text-neutral-100" : "text-neutral-900"}
+                        textAlign="text-center"
+                        textDisplay="Drop!"
+                        bgImage=""
+                        handlerFunction={isPlayer1Turn ? () => handleDrop(selectedCol, isPlayer1Turn) : () => { /* do nothing */ }}
                     />
-                    <ColumnSelectButton
-                        isLeft={false}
-                        handleColSelect={isPlayer1Turn ? handleColSelect : () => { /* do nothing */ }}
-                        isPlayer1Turn={isPlayer1Turn}
-                    />
-                </div>
-            }
-
-            {!isGameOver &&
-                <MenuButton 
-                    bgColor={isPlayer1Turn ? "bg-red-300" : "bg-yellow-300"}
-                    textColor={isPlayer1Turn ? "text-neutral-100" : "text-neutral-900"}
-                    textAlign="text-center"
-                    textDisplay="Drop!"
-                    bgImage=""
-                    handlerFunction={isPlayer1Turn ? () => handleDrop(selectedCol, isPlayer1Turn) : () => { /* do nothing */ }}
-                />
-            }
+                }
+            </div>
 
             {isGameOver && 
                 <ResultDisplay

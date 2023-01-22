@@ -18,13 +18,16 @@ export default function Column(props){
     }).reverse()
 
     return (
-        <div className="grid grid-rows-6 gap-[0.22rem]">
-            { props.rowIndex === props.selectedCol 
-                && <ColumnIndicator
-                        isPlayer1Turn={props.isPlayer1Turn}
-                    /> 
-            }
-            { spaces }
+        <div className='h-[85%] mt-[8%]'>
+            <ColumnIndicator
+                isPlayer1Turn={props.isPlayer1Turn}
+                rowIndex={props.rowIndex}
+                selectedCol={props.selectedCol}
+            /> 
+            <div className="grid grid-rows-6 mt-[30%]">
+                
+                { spaces }
+            </div>
         </div>
     )
 }

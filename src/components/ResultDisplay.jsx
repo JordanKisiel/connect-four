@@ -31,10 +31,13 @@ export default function ResultDisplay(props){
             w-5/6
             flex
             flex-col
-            items-center"
+            items-center
+            md:top-[50%]
+            md:w-[65%]
+            "
         >
-            <span className="text-base font-bold text-center uppercase">{winningPlayer}</span>
-            <span className="text-6xl font-bold text-center uppercase mb-1.5">{props.isWinner ? 'Wins' : 'Draw'}</span>
+            <span className="text-base font-bold text-center uppercase md:text-2xl">{winningPlayer}</span>
+            <span className="text-6xl font-bold text-center uppercase mb-1.5 md:text-7xl md:mb-5">{props.isWinner ? 'Wins' : 'Draw'}</span>
             <Button
                 bgColor="bg-purple-500"
                 textColor="text-neutral-100"

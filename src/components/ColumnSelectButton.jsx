@@ -21,6 +21,7 @@ export default function ColumnSelectButton(props){
     return (
         <button>
             <img
+                className='md:w-[150%]'
                 onClick={() => props.handleColSelect(props.isLeft)}
                 src={props.isLeft ? leftOption : rightOption}
             />
