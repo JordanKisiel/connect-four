@@ -12,7 +12,7 @@ export default function MainMenu(props){
     }
 
     return (
-        <div className="h-[100vh] flex flex-col items-center justify-center p-4 mx-auto sm:max-w-xl md:justify-start md:mt-[30%] lg:mt-[22%]">
+        <div className="h-[100vh] flex flex-col items-center justify-center p-4 mx-auto sm:max-w-xl md:justify-start md:pt-[14rem]">
             <img className="mb-16" src={logo} alt="logo" />
             <div className="w-full space-y-6">
                 <MenuButton 

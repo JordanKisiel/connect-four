@@ -1,9 +1,10 @@
 import React from 'react'
+import checkIcon from '../assets/icon-check.svg'
 
 export default function Rules(props){
 
     return (
-        <div className="h-[100vh] flex flex-col items-center justify-center p-4 mx-auto sm:max-w-xl md:justify-start md:mt-[25%] lg:mt-[18%]">
+        <div className="h-[100vh] flex flex-col items-center justify-center p-4 mx-auto sm:max-w-xl md:justify-start md:pt-[13rem]">
             <div className="relative bg-neutral-100 shadow-2xl border-[3px] border-neutral-900 rounded-[40px] px-6 pt-12 pb-16 space-y-10 flex flex-col items-center">
                 <h2 className="text-6xl font-bold uppercase">Rules</h2>
                 <div className="space-y-4">
@@ -19,7 +20,9 @@ export default function Rules(props){
                         <li className="pl-3">The starter of the previous game goes second on the next game.</li>
                     </ol>
                 </div>
-                <button onClick={props.handleDisplay} className="absolute -bottom-10 text-transparent bg-no-repeat bg-[url(src/assets/icon-check.svg)] bg-center w-20 aspect-square">Ok</button>
+                <button onClick={props.handleDisplay} className="absolute -bottom-10 w-20 aspect-square">
+                    <img src={checkIcon} />
+                </button>
             </div>
         </div>
     )
