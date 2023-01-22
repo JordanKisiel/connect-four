@@ -200,10 +200,11 @@ export default function Game(props){
                 md:max-w-[40rem]
                 md:pt-12
                 md:bg-[length:38rem_20rem]
+                short:pt-12
                 `
                 }
         >
-            <div className="relative w-full flex justify-between items-center mb-32">
+            <div className="relative w-full flex justify-between items-center mb-32 short:mb-20">
                 <Button 
                     textDisplay="Menu" 
                     bgColor="bg-purple-500" 
@@ -232,9 +233,9 @@ export default function Game(props){
                 winningSlots={getWinningSlots(board)}
             />
             
-            <div className='w-full md:w-[80%]'>
+            <div className='w-full flex-col items-center md:w-[30rem]'>
                 {!isGameOver &&
-                    <div className="w-full flex justify-between items-center mb-12 sm:mb-9 md:mb-8 lg:mb-6">
+                    <div className="w-full flex justify-between items-center mb-12 sm:mb-9 md:mb-8 lg:mb-6 short:mb-4">
                         <ColumnSelectButton
                             isLeft={true}
                             handleColSelect={isPlayer1Turn ? handleColSelect : () => { /* do nothing */ }}

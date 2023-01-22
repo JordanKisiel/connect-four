@@ -5,9 +5,9 @@ export default function Rules(props){
 
     return (
         <div className="h-[100vh] flex flex-col items-center justify-center p-4 mx-auto sm:max-w-xl md:justify-start md:pt-[13rem]">
-            <div className="relative bg-neutral-100 shadow-2xl border-[3px] border-neutral-900 rounded-[40px] px-6 pt-12 pb-16 space-y-10 flex flex-col items-center">
-                <h2 className="text-6xl font-bold uppercase">Rules</h2>
-                <div className="space-y-4">
+            <div className="relative bg-neutral-100 shadow-2xl border-[3px] border-neutral-900 rounded-[40px] px-6 pt-12 pb-16 space-y-10 flex flex-col items-center short:pt-6 short:space-y-5">
+                <h2 className="text-6xl font-bold uppercase short:text-5xl">Rules</h2>
+                <div className="space-y-4 short:space-y-2">
                     <h3 className="uppercase text-purple-400 font-bold text-xl">Objective</h3>
                     <p className="leading-5">Be the first player to connect 4 of the same colored discs in a row (either vertically, horizontally, or diagonally).</p>
                 </div>

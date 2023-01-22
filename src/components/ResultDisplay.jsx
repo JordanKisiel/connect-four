@@ -34,6 +34,7 @@ export default function ResultDisplay(props){
             items-center
             md:top-[50%]
             md:w-[65%]
+            lg:top-[65%]
             "
         >
             <span className="text-base font-bold text-center uppercase md:text-2xl">{winningPlayer}</span>

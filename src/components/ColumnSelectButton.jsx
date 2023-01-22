@@ -19,9 +19,9 @@ export default function ColumnSelectButton(props){
     }
 
     return (
-        <button>
+        <button className='flex justify-center'>
             <img
-                className='md:w-[150%]'
+                className='md:w-[150%] short:w-[80%]'
                 onClick={() => props.handleColSelect(props.isLeft)}
                 src={props.isLeft ? leftOption : rightOption}
             />

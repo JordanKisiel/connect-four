@@ -3,13 +3,15 @@
 //three difficulties choose from the top 3 moves
 //with different frequencies
 //difficulty should be 'easy', 'medium', or 'hard'
-//after some tuning, it makes more sense just to choose from
-//the top 2 moves because in the early game it's too easy to lose to
-//2nd or third best moves
-//could make eval function more sophisticated by rewarding placement more towards
-//central columns
+//the frequecies also increase as more moves are made
+//this replicates the feeling a human making more mistakes
+//in more complex situations
 export function getAIMove(board, difficulty){
-    const depth = 3
+    const depth = 4
+    const totalSpaces = 42
+    const complexityVelocityEasy = 20 //adjusts how quickly the AI will start to choose the next best moves
+    const complexityVelocityMedium = 15
+    const complexityVelocityHard = 10 
 
     //array of child positions and their associated eval scores
     //will be limited to best 3 positions by score
@@ -53,23 +55,29 @@ export function getAIMove(board, difficulty){
     })
 
     const rand = Math.random()
+    const boardComplexity = 1 / (totalSpaces - getTotalDiscs(board))
+
     if(difficulty === 'easy'){
-        if(rand < 0){ //for now, leaving this option although it will never be chosen incase I fine tune some more
-            chosenMove = getLastMove(board, best3Moves[2][0])
+        const adjRand = (1 - rand * boardComplexity * complexityVelocityEasy)
+
+        if(adjRand < 0.25){ //for now, leaving this option although it will never be chosen incase I fine tune some more
+            chosenMove = getLastMove(board, best3Moves[2][0])  //third best move
         }
-        else if(rand < 0.40){
-            chosenMove = getLastMove(board, best3Moves[1][0])
+        else if(adjRand < 0.50){
+            chosenMove = getLastMove(board, best3Moves[1][0])  //second best
         }
         else{
-            chosenMove = getLastMove(board, best3Moves[0][0])
+            chosenMove = getLastMove(board, best3Moves[0][0])  //best
         }
     }
 
     if(difficulty === 'medium'){
-        if(rand < 0){
+        const adjRand = (1 - rand * boardComplexity * complexityVelocityMedium)
+
+        if(adjRand < 0.1){
             chosenMove = getLastMove(board, best3Moves[2][0])
         }
-        else if(rand < 0.25){
+        else if(adjRand < 0.25){
             chosenMove = getLastMove(board, best3Moves[1][0])
         }
         else{
@@ -78,10 +86,12 @@ export function getAIMove(board, difficulty){
     
     }
     if(difficulty === 'hard'){
-        if(rand < 0){
+        const adjRand = (1 - rand * boardComplexity * complexityVelocityHard)
+
+        if(adjRand < 0.05){
             chosenMove = getLastMove(board, best3Moves[2][0])
         }
-        else if(rand < 0.15){
+        else if(adjRand < 0.1){
             chosenMove = getLastMove(board, best3Moves[1][0])
         }
         else{
@@ -735,4 +745,20 @@ function getNumLinesOf3(board, player){
     }
 
     return linesOf3.length - (duplicatedLinesCount / 2)
+}
+
+//returns the number of discs on the board regardless of which player
+//played them
+function getTotalDiscs(board){
+    let totalDiscs = 0
+
+    for(let i = 0; i < board.length; i++){
+        for(let j = 0; j < board[0].length; j++){
+            if(board[i][j] !== null){
+                totalDiscs += 1
+            }
+        }
+    }
+
+    return totalDiscs
 }
